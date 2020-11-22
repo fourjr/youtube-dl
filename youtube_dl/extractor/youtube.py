@@ -2024,6 +2024,21 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
             else:
                 error_message = extract_unavailable_message()
                 if not error_message:
+                    reason_list = try_get(
+                        player_response,
+                        lambda x: x['playabilityStatus']['errorScreen']['playerErrorMessageRenderer']['subreason']['runs'],
+                        list) or []
+                    for reason in reason_list:
+                        if not isinstance(reason, dict):
+                            continue
+                        reason_text = try_get(reason, lambda x: x['text'], compat_str)
+                        if reason_text:
+                            if not error_message:
+                                error_message = ''
+                            error_message += reason_text
+                    if error_message:
+                        error_message = clean_html(error_message)
+                if not error_message:
                     error_message = clean_html(try_get(
                         player_response, lambda x: x['playabilityStatus']['reason'],
                         compat_str))
@@ -2605,10 +2620,13 @@ class YoutubeTabIE(YoutubeBaseInfoExtractor):
     }, {
         'url': 'https://www.youtube.com/c/CommanderVideoHq/live',
         'only_matching': True,
-    }, {
-        'url': 'https://www.youtube.com/TheYoungTurks/live',
-        'only_matching': True,
-    }]
+    },
+    # TODO
+    # {
+    #     'url': 'https://www.youtube.com/TheYoungTurks/live',
+    #     'only_matching': True,
+    # }
+    ]
 
     def _extract_channel_id(self, webpage):
         channel_id = self._html_search_meta(
