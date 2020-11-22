@@ -1062,6 +1062,7 @@ from .spike import (
     ParamountNetworkIE,
 )
 from .stitcher import StitcherIE
+from .straitstimes import StraitsTimesIE
 from .sport5 import Sport5IE
 from .sportbox import SportBoxIE
 from .sportdeutschland import SportDeutschlandIE
